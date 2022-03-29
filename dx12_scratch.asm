@@ -10,16 +10,34 @@ PUBLIC	IID_IXAudio2
 PUBLIC	?width@@3IA					; width
 PUBLIC	?height@@3IA					; height
 CONST	SEGMENT
-$SG141083 DB	'COMPUTE_SHADER_TEST', 00H
+$SG141144 DB	'COMPUTE_SHADER_TEST', 00H
 $SG117260 DB	', ', 00H
 	ORG $+1
-$SG141084 DB	'COMPUTE_SHADER_TEST', 00H
+$SG141145 DB	'COMPUTE_SHADER_TEST', 00H
+$SG141164 DB	'vs_5_0', 00H
+	ORG $+1
+$SG141165 DB	'VSMain', 00H
+	ORG $+1
+$SG117261 DB	', ', 00H
+	ORG $+1
+$SG141166 DB	's', 00H, 'h', 00H, 'a', 00H, 'd', 00H, 'e', 00H, 'r', 00H
+	DB	'.', 00H, 'h', 00H, 'l', 00H, 's', 00H, 'l', 00H, 00H, 00H
+$SG141168 DB	'ERROR', 00H
+	ORG $+2
+$SG141169 DB	'ps_5_0', 00H
+	ORG $+1
+$SG141170 DB	'PSMain', 00H
+	ORG $+1
+$SG141171 DB	's', 00H, 'h', 00H, 'a', 00H, 'd', 00H, 'e', 00H, 'r', 00H
+	DB	'.', 00H, 'h', 00H, 'l', 00H, 's', 00H, 'l', 00H, 00H, 00H
+$SG141173 DB	'ERROR', 00H
+	ORG $+2
+$SG141174 DB	'POSITION', 00H
+	ORG $+3
 $SG117256 DB	'true', 00H
 	ORG $+3
 $SG117257 DB	'false', 00H
 	ORG $+2
-$SG117261 DB	', ', 00H
-	ORG $+1
 $SG117262 DB	', ', 00H
 	ORG $+1
 $SG117265 DB	', ', 00H
@@ -89,6 +107,8 @@ PUBLIC	??$IID_PPV_ARGS_Helper@UID3D12DescriptorHeap@@@@YAPEAPEAXPEAPEAUID3D12Des
 PUBLIC	??$IID_PPV_ARGS_Helper@UID3D12Resource@@@@YAPEAPEAXPEAPEAUID3D12Resource@@@Z ; IID_PPV_ARGS_Helper<ID3D12Resource>
 PUBLIC	??$IID_PPV_ARGS_Helper@UID3D12CommandAllocator@@@@YAPEAPEAXPEAPEAUID3D12CommandAllocator@@@Z ; IID_PPV_ARGS_Helper<ID3D12CommandAllocator>
 PUBLIC	??$IID_PPV_ARGS_Helper@UID3D12GraphicsCommandList@@@@YAPEAPEAXPEAPEAUID3D12GraphicsCommandList@@@Z ; IID_PPV_ARGS_Helper<ID3D12GraphicsCommandList>
+PUBLIC	??$IID_PPV_ARGS_Helper@UID3D12RootSignature@@@@YAPEAPEAXPEAPEAUID3D12RootSignature@@@Z ; IID_PPV_ARGS_Helper<ID3D12RootSignature>
+PUBLIC	??$IID_PPV_ARGS_Helper@UID3D12PipelineState@@@@YAPEAPEAXPEAPEAUID3D12PipelineState@@@Z ; IID_PPV_ARGS_Helper<ID3D12PipelineState>
 PUBLIC	??$IID_PPV_ARGS_Helper@UID3D12Fence@@@@YAPEAPEAXPEAPEAUID3D12Fence@@@Z ; IID_PPV_ARGS_Helper<ID3D12Fence>
 PUBLIC	_GUID_c1b6694f_ff09_44a9_b03c_77900a0a1d17
 PUBLIC	_GUID_29038f61_3839_4626_91fd_086879011a05
@@ -101,9 +121,13 @@ PUBLIC	_GUID_8efb471d_616c_4f49_90f7_127bb763fa51
 PUBLIC	_GUID_696442be_a72e_4059_bc79_5b5c98040fad
 PUBLIC	_GUID_6102dee4_af59_4b09_b999_b44d73f09b24
 PUBLIC	_GUID_5b160d0f_ac1b_4185_8ba8_b3ae42a5a455
+PUBLIC	_GUID_c54a6b66_72df_4ee8_8be5_a946a1429214
+PUBLIC	_GUID_765a30f3_f624_4c6f_a828_ace948622445
 PUBLIC	_GUID_0a753dcf_c4d8_4b91_adf6_be5a60d95a76
 PUBLIC	__real@00000000
+PUBLIC	__real@3f000000
 PUBLIC	__real@3f800000
+PUBLIC	__real@bf000000
 PUBLIC	__xmm@00000000000000000000000000000000
 PUBLIC	__xmm@80000000800000008000000080000000
 EXTRN	__imp_GetLastError:PROC
@@ -118,10 +142,13 @@ EXTRN	__imp_CreateWindowExA:PROC
 EXTRN	__imp_ShowWindow:PROC
 EXTRN	__imp_GetSystemMetrics:PROC
 EXTRN	__imp_AdjustWindowRect:PROC
+EXTRN	__imp_MessageBoxA:PROC
 EXTRN	__imp_LoadCursorA:PROC
 EXTRN	exit:PROC
+EXTRN	D3D12SerializeRootSignature:PROC
 EXTRN	D3D12CreateDevice:PROC
 EXTRN	D3D12GetDebugInterface:PROC
+EXTRN	D3DCompileFromFile:PROC
 EXTRN	CreateDXGIFactory2:PROC
 EXTRN	DXGIDeclareAdapterRemovalSupport:PROC
 EXTRN	__GSHandlerCheck:PROC
@@ -142,8 +169,8 @@ $pdata$?HRESULT_FROM_WIN32@@YAJK@Z DD imagerel $LN5
 	DD	imagerel $unwind$?HRESULT_FROM_WIN32@@YAJK@Z
 pdata	ENDS
 pdata	SEGMENT
-$pdata$WinMain DD imagerel $LN38
-	DD	imagerel $LN38+3563
+$pdata$WinMain DD imagerel $LN50
+	DD	imagerel $LN50+6391
 	DD	imagerel $unwind$WinMain
 pdata	ENDS
 ;	COMDAT pdata
@@ -206,9 +233,17 @@ CONST	SEGMENT
 __xmm@00000000000000000000000000000000 DB 00H, 00H, 00H, 00H, 00H, 00H, 00H
 	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
 CONST	ENDS
+;	COMDAT __real@bf000000
+CONST	SEGMENT
+__real@bf000000 DD 0bf000000r			; -0.5
+CONST	ENDS
 ;	COMDAT __real@3f800000
 CONST	SEGMENT
 __real@3f800000 DD 03f800000r			; 1
+CONST	ENDS
+;	COMDAT __real@3f000000
+CONST	SEGMENT
+__real@3f000000 DD 03f000000r			; 0.5
 CONST	ENDS
 ;	COMDAT __real@00000000
 CONST	SEGMENT
@@ -227,6 +262,34 @@ _GUID_0a753dcf_c4d8_4b91_adf6_be5a60d95a76 DD 0a753dcfH
 	DB	0d9H
 	DB	05aH
 	DB	076H
+CONST	ENDS
+;	COMDAT _GUID_765a30f3_f624_4c6f_a828_ace948622445
+CONST	SEGMENT
+_GUID_765a30f3_f624_4c6f_a828_ace948622445 DD 0765a30f3H
+	DW	0f624H
+	DW	04c6fH
+	DB	0a8H
+	DB	028H
+	DB	0acH
+	DB	0e9H
+	DB	048H
+	DB	062H
+	DB	024H
+	DB	045H
+CONST	ENDS
+;	COMDAT _GUID_c54a6b66_72df_4ee8_8be5_a946a1429214
+CONST	SEGMENT
+_GUID_c54a6b66_72df_4ee8_8be5_a946a1429214 DD 0c54a6b66H
+	DW	072dfH
+	DW	04ee8H
+	DB	08bH
+	DB	0e5H
+	DB	0a9H
+	DB	046H
+	DB	0a1H
+	DB	042H
+	DB	092H
+	DB	014H
 CONST	ENDS
 ;	COMDAT _GUID_5b160d0f_ac1b_4185_8ba8_b3ae42a5a455
 CONST	SEGMENT
@@ -403,11 +466,11 @@ $unwind$??0Vector3@@QEAA@M@Z DD 010f01H
 	DD	0220fH
 xdata	ENDS
 xdata	SEGMENT
-$unwind$WinMain DD 032e19H
-	DD	060011cH
-	DD	07015H
+$unwind$WinMain DD 042f19H
+	DD	0eb011dH
+	DD	060157016H
 	DD	imagerel __GSHandlerCheck
-	DD	02f0H
+	DD	0740H
 $unwind$??G@YA?ATVector3@@T0@0@Z DD 011301H
 	DD	08213H
 $unwind$??G@YA?ATVector3@@T0@@Z DD 010e01H
@@ -453,6 +516,34 @@ pp$ = 8
 ; Line 358
 	ret	0
 ??$IID_PPV_ARGS_Helper@UID3D12Fence@@@@YAPEAPEAXPEAPEAUID3D12Fence@@@Z ENDP ; IID_PPV_ARGS_Helper<ID3D12Fence>
+_TEXT	ENDS
+; Function compile flags: /Odtp
+;	COMDAT ??$IID_PPV_ARGS_Helper@UID3D12PipelineState@@@@YAPEAPEAXPEAPEAUID3D12PipelineState@@@Z
+_TEXT	SEGMENT
+pp$ = 8
+??$IID_PPV_ARGS_Helper@UID3D12PipelineState@@@@YAPEAPEAXPEAPEAUID3D12PipelineState@@@Z PROC ; IID_PPV_ARGS_Helper<ID3D12PipelineState>, COMDAT
+; File C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um\combaseapi.h
+; Line 354
+	mov	QWORD PTR [rsp+8], rcx
+; Line 357
+	mov	rax, QWORD PTR pp$[rsp]
+; Line 358
+	ret	0
+??$IID_PPV_ARGS_Helper@UID3D12PipelineState@@@@YAPEAPEAXPEAPEAUID3D12PipelineState@@@Z ENDP ; IID_PPV_ARGS_Helper<ID3D12PipelineState>
+_TEXT	ENDS
+; Function compile flags: /Odtp
+;	COMDAT ??$IID_PPV_ARGS_Helper@UID3D12RootSignature@@@@YAPEAPEAXPEAPEAUID3D12RootSignature@@@Z
+_TEXT	SEGMENT
+pp$ = 8
+??$IID_PPV_ARGS_Helper@UID3D12RootSignature@@@@YAPEAPEAXPEAPEAUID3D12RootSignature@@@Z PROC ; IID_PPV_ARGS_Helper<ID3D12RootSignature>, COMDAT
+; File C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um\combaseapi.h
+; Line 354
+	mov	QWORD PTR [rsp+8], rcx
+; Line 357
+	mov	rax, QWORD PTR pp$[rsp]
+; Line 358
+	ret	0
+??$IID_PPV_ARGS_Helper@UID3D12RootSignature@@@@YAPEAPEAXPEAPEAUID3D12RootSignature@@@Z ENDP ; IID_PPV_ARGS_Helper<ID3D12RootSignature>
 _TEXT	ENDS
 ; Function compile flags: /Odtp
 ;	COMDAT ??$IID_PPV_ARGS_Helper@UID3D12GraphicsCommandList@@@@YAPEAPEAXPEAPEAUID3D12GraphicsCommandList@@@Z
@@ -1545,74 +1636,106 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 d3d12FrameIndex$ = 96
 d3d12CommandList$ = 104
-d3d12UseWarpDevice$ = 112
-running$ = 113
-n$1 = 116
-d3d12Device$ = 120
-rtvHandle$ = 128
-d3d12SwapChain$ = 136
+d3d12Device$ = 112
+d3d12UseWarpDevice$ = 120
+running$ = 121
+n$1 = 124
+i$2 = 128
+error$ = 136
 d3d12Fence$ = 144
-dxgiFactoryFlags$ = 152
-d3d12FrameCount$ = 156
-factory$ = 160
+factory$ = 152
+d3d12SwapChain$ = 160
 d3d12CommandQueue$ = 168
-d3d12RTVDescriptorSize$ = 176
-d3d12FenceEvent$ = 184
-d3d12FenceValues$ = 192
-d3d12RTVHeap$ = 208
-monitorWidth$ = 216
-tv79 = 220
-monitorHeight$ = 224
-tv82 = 228
-windowY$ = 232
-windowX$ = 236
-windowHandle$ = 240
-debugController$ = 248
-currentFenceValue$2 = 256
-resBarrier$3 = 264
-d3d12CommandAllocators$ = 296
-tv714 = 312
-swapChain$ = 320
-tv710 = 328
-tv707 = 336
-tv706 = 344
-tv705 = 352
-tv704 = 360
-tv702 = 368
-tv699 = 376
-ppCommandList$4 = 384
-tv685 = 392
-tv684 = 400
-tv683 = 408
-tv715 = 416
-warpAdapter$5 = 424
-hardwareAdapter$6 = 432
-d3d12RenderTargets$ = 440
-$T7 = 456
-windowClass$ = 464
-msg$8 = 544
-windowRect$ = 592
-rtvHeapDesc$ = 608
-d3d12ScissorRect$ = 624
-d3d12Viewport$ = 640
-queueDesc$ = 664
-swapChainDesc$ = 680
-cc$9 = 736
-__$ArrayPad$ = 752
-hInstance$ = 784
-hPrevInstance$ = 792
-lpCmdLine$ = 800
-nCmdShow$ = 808
+rtvHandle$ = 176
+d3d12FrameCount$ = 184
+dxgiFactoryFlags$ = 188
+d3d12VertexBuffer$ = 192
+d3d12IndexBuffer$ = 200
+d3d12CompileFlags$ = 208
+d3d12RTVDescriptorSize$ = 212
+d3d12FenceValues$ = 216
+signature$ = 232
+vertexShader$ = 240
+pixelShader$ = 248
+d3d12RTVHeap$ = 256
+d3d12FenceEvent$ = 264
+monitorWidth$ = 272
+monitorHeight$ = 276
+tv82 = 280
+windowY$ = 284
+windowX$ = 288
+tv79 = 292
+debugController$ = 296
+windowHandle$ = 304
+d3d12GraphicsRootSignature$ = 312
+warpAdapter$3 = 320
+hardwareAdapter$4 = 328
+swapChain$ = 336
+vPtr$ = 344
+ePtr$ = 352
+currentFenceValue$5 = 360
+d3d12CommandAllocators$ = 368
+resBarrier$6 = 384
+tv1175 = 416
+tv1172 = 424
+tv1171 = 432
+tv1170 = 440
+tv1169 = 448
+tv1167 = 456
+tv1166 = 464
+tv445 = 472
+tv484 = 480
+tv1165 = 488
+tv1158 = 496
+tv1157 = 504
+tv1155 = 512
+tv1149 = 520
+d3d12PipelineState$ = 528
+tv1146 = 536
+ppCommandList$7 = 544
+tv1127 = 552
+tv1126 = 560
+tv1125 = 568
+tv1180 = 576
+d3d12RenderTargets$ = 584
+tv1179 = 600
+inputElementDescs$ = 608
+$T8 = 640
+$T9 = 656
+windowClass$ = 672
+msg$10 = 752
+rootSignatureDesc$ = 800
+windowRect$ = 840
+psoDesc$ = 864
+bufHeapProp$ = 1520
+d3d12ScissorRect$ = 1544
+d3d12Viewport$ = 1560
+rtvHeapDesc$ = 1584
+d3d12VertexBufferView$ = 1600
+d3d12IndexBufferView$ = 1616
+bufResDesc$ = 1632
+defaultRenderTargetBlendDesc$ = 1688
+queueDesc$ = 1728
+swapChainDesc$ = 1744
+cc$11 = 1792
+triVerts$ = 1808
+triElms$ = 1848
+__$ArrayPad$ = 1856
+hInstance$ = 1904
+hPrevInstance$ = 1912
+lpCmdLine$ = 1920
+nCmdShow$ = 1928
 WinMain	PROC
 ; File C:\Users\Dave\Desktop\code\dx12_scratch\dx12_scratch.cpp
 ; Line 61
-$LN38:
+$LN50:
 	mov	DWORD PTR [rsp+32], r9d
 	mov	QWORD PTR [rsp+24], r8
 	mov	QWORD PTR [rsp+16], rdx
 	mov	QWORD PTR [rsp+8], rcx
+	push	rsi
 	push	rdi
-	sub	rsp, 768				; 00000300H
+	sub	rsp, 1880				; 00000758H
 	mov	rax, QWORD PTR __security_cookie
 	xor	rax, rsp
 	mov	QWORD PTR __$ArrayPad$[rsp], rax
@@ -1638,7 +1761,7 @@ $LN38:
 	call	QWORD PTR __imp_LoadCursorA
 	mov	QWORD PTR windowClass$[rsp+40], rax
 ; Line 69
-	lea	rax, OFFSET FLAT:$SG141083
+	lea	rax, OFFSET FLAT:$SG141144
 	mov	QWORD PTR windowClass$[rsp+64], rax
 ; Line 70
 	lea	rcx, QWORD PTR windowClass$[rsp]
@@ -1712,11 +1835,23 @@ $LN38:
 	mov	eax, DWORD PTR windowX$[rsp]
 	mov	DWORD PTR [rsp+32], eax
 	mov	r9d, 13565952				; 00cf0000H
-	lea	r8, OFFSET FLAT:$SG141084
+	lea	r8, OFFSET FLAT:$SG141145
 	mov	rdx, QWORD PTR windowClass$[rsp+64]
 	xor	ecx, ecx
 	call	QWORD PTR __imp_CreateWindowExA
 	mov	QWORD PTR windowHandle$[rsp], rax
+; Line 85
+	lea	rax, QWORD PTR d3d12Viewport$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 24
+	rep stosb
+; Line 86
+	lea	rax, QWORD PTR d3d12ScissorRect$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 16
+	rep stosb
 ; Line 87
 	xorps	xmm0, xmm0
 	movss	DWORD PTR d3d12Viewport$[rsp], xmm0
@@ -1750,11 +1885,13 @@ $LN38:
 ; Line 97
 	call	DXGIDeclareAdapterRemovalSupport
 	test	eax, eax
-	jge	SHORT $LN9@WinMain
+	jge	SHORT $LN12@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN9@WinMain:
+$LN12@WinMain:
 ; Line 99
 	mov	DWORD PTR dxgiFactoryFlags$[rsp], 0
+; Line 100
+	mov	QWORD PTR debugController$[rsp], 0
 ; Line 101
 	lea	rcx, QWORD PTR debugController$[rsp]
 	call	??$IID_PPV_ARGS_Helper@UID3D12Debug@@@@YAPEAPEAXPEAPEAUID3D12Debug@@@Z ; IID_PPV_ARGS_Helper<ID3D12Debug>
@@ -1762,7 +1899,7 @@ $LN9@WinMain:
 	lea	rcx, OFFSET FLAT:_GUID_344488b7_6846_474b_b989_f027448245e0
 	call	D3D12GetDebugInterface
 	test	eax, eax
-	jl	SHORT $LN10@WinMain
+	jl	SHORT $LN13@WinMain
 ; Line 102
 	mov	rax, QWORD PTR debugController$[rsp]
 	mov	rax, QWORD PTR [rax]
@@ -1772,7 +1909,9 @@ $LN9@WinMain:
 	mov	eax, DWORD PTR dxgiFactoryFlags$[rsp]
 	or	eax, 1
 	mov	DWORD PTR dxgiFactoryFlags$[rsp], eax
-$LN10@WinMain:
+$LN13@WinMain:
+; Line 106
+	mov	QWORD PTR factory$[rsp], 0
 ; Line 107
 	lea	rcx, QWORD PTR factory$[rsp]
 	call	??$IID_PPV_ARGS_Helper@UIDXGIFactory4@@@@YAPEAPEAXPEAPEAUIDXGIFactory4@@@Z ; IID_PPV_ARGS_Helper<IDXGIFactory4>
@@ -1781,47 +1920,53 @@ $LN10@WinMain:
 	mov	ecx, DWORD PTR dxgiFactoryFlags$[rsp]
 	call	CreateDXGIFactory2
 	test	eax, eax
-	jge	SHORT $LN11@WinMain
+	jge	SHORT $LN14@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN11@WinMain:
+$LN14@WinMain:
+; Line 109
+	mov	QWORD PTR d3d12Device$[rsp], 0
 ; Line 110
 	mov	BYTE PTR d3d12UseWarpDevice$[rsp], 0
 ; Line 111
 	movzx	eax, BYTE PTR d3d12UseWarpDevice$[rsp]
 	test	eax, eax
-	je	$LN12@WinMain
+	je	$LN15@WinMain
+; Line 112
+	mov	QWORD PTR warpAdapter$3[rsp], 0
 ; Line 113
-	lea	rcx, QWORD PTR warpAdapter$5[rsp]
+	lea	rcx, QWORD PTR warpAdapter$3[rsp]
 	call	??$IID_PPV_ARGS_Helper@UIDXGIAdapter@@@@YAPEAPEAXPEAPEAUIDXGIAdapter@@@Z ; IID_PPV_ARGS_Helper<IDXGIAdapter>
 	mov	rcx, QWORD PTR factory$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv715[rsp], rcx
+	mov	QWORD PTR tv1180[rsp], rcx
 	mov	r8, rax
 	lea	rdx, OFFSET FLAT:_GUID_2411e7e1_12ac_4ccf_bd14_9798e8534dc0
 	mov	rcx, QWORD PTR factory$[rsp]
-	mov	rax, QWORD PTR tv715[rsp]
+	mov	rax, QWORD PTR tv1180[rsp]
 	call	QWORD PTR [rax+216]
 	test	eax, eax
-	jge	SHORT $LN14@WinMain
+	jge	SHORT $LN17@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN14@WinMain:
+$LN17@WinMain:
 ; Line 115
 	lea	rcx, QWORD PTR d3d12Device$[rsp]
 	call	??$IID_PPV_ARGS_Helper@UID3D12Device@@@@YAPEAPEAXPEAPEAUID3D12Device@@@Z ; IID_PPV_ARGS_Helper<ID3D12Device>
 	mov	r9, rax
 	lea	r8, OFFSET FLAT:_GUID_189819f1_1db6_4b57_be54_1821339b85f7
 	mov	edx, 45056				; 0000b000H
-	mov	rcx, QWORD PTR warpAdapter$5[rsp]
+	mov	rcx, QWORD PTR warpAdapter$3[rsp]
 	call	D3D12CreateDevice
 	test	eax, eax
-	jge	SHORT $LN15@WinMain
+	jge	SHORT $LN18@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN15@WinMain:
+$LN18@WinMain:
 ; Line 116
-	jmp	SHORT $LN13@WinMain
-$LN12@WinMain:
+	jmp	SHORT $LN16@WinMain
+$LN15@WinMain:
+; Line 117
+	mov	QWORD PTR hardwareAdapter$4[rsp], 0
 ; Line 118
-	lea	rdx, QWORD PTR hardwareAdapter$6[rsp]
+	lea	rdx, QWORD PTR hardwareAdapter$4[rsp]
 	mov	rcx, QWORD PTR factory$[rsp]
 	call	?getD3D12HardwareAdapter@@YAXPEAUIDXGIFactory1@@PEAPEAUIDXGIAdapter1@@@Z ; getD3D12HardwareAdapter
 ; Line 120
@@ -1830,13 +1975,15 @@ $LN12@WinMain:
 	mov	r9, rax
 	lea	r8, OFFSET FLAT:_GUID_189819f1_1db6_4b57_be54_1821339b85f7
 	mov	edx, 45056				; 0000b000H
-	mov	rcx, QWORD PTR hardwareAdapter$6[rsp]
+	mov	rcx, QWORD PTR hardwareAdapter$4[rsp]
 	call	D3D12CreateDevice
 	test	eax, eax
-	jge	SHORT $LN16@WinMain
+	jge	SHORT $LN19@WinMain
 	mov	DWORD PTR ds:0, 0
+$LN19@WinMain:
 $LN16@WinMain:
-$LN13@WinMain:
+; Line 123
+	mov	QWORD PTR d3d12CommandQueue$[rsp], 0
 ; Line 124
 	lea	rax, QWORD PTR queueDesc$[rsp]
 	mov	rdi, rax
@@ -1852,17 +1999,17 @@ $LN13@WinMain:
 	call	??$IID_PPV_ARGS_Helper@UID3D12CommandQueue@@@@YAPEAPEAXPEAPEAUID3D12CommandQueue@@@Z ; IID_PPV_ARGS_Helper<ID3D12CommandQueue>
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv714[rsp], rcx
+	mov	QWORD PTR tv1179[rsp], rcx
 	mov	r9, rax
 	lea	r8, OFFSET FLAT:_GUID_0ec870a6_5d7e_4c22_8cfc_5baae07616ed
 	lea	rdx, QWORD PTR queueDesc$[rsp]
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
-	mov	rax, QWORD PTR tv714[rsp]
+	mov	rax, QWORD PTR tv1179[rsp]
 	call	QWORD PTR [rax+64]
 	test	eax, eax
-	jge	SHORT $LN17@WinMain
+	jge	SHORT $LN20@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN17@WinMain:
+$LN20@WinMain:
 ; Line 129
 	mov	DWORD PTR d3d12FrameCount$[rsp], 2
 ; Line 130
@@ -1888,6 +2035,8 @@ $LN17@WinMain:
 	mov	DWORD PTR swapChainDesc$[rsp+36], 4
 ; Line 137
 	mov	DWORD PTR swapChainDesc$[rsp+16], 1
+; Line 139
+	mov	QWORD PTR swapChain$[rsp], 0
 ; Line 140
 	mov	rax, QWORD PTR factory$[rsp]
 	mov	rax, QWORD PTR [rax]
@@ -1901,9 +2050,9 @@ $LN17@WinMain:
 	mov	rcx, QWORD PTR factory$[rsp]
 	call	QWORD PTR [rax+120]
 	test	eax, eax
-	jge	SHORT $LN18@WinMain
+	jge	SHORT $LN21@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN18@WinMain:
+$LN21@WinMain:
 ; Line 141
 	mov	rax, QWORD PTR factory$[rsp]
 	mov	rax, QWORD PTR [rax]
@@ -1912,9 +2061,9 @@ $LN18@WinMain:
 	mov	rcx, QWORD PTR factory$[rsp]
 	call	QWORD PTR [rax+64]
 	test	eax, eax
-	jge	SHORT $LN19@WinMain
+	jge	SHORT $LN22@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN19@WinMain:
+$LN22@WinMain:
 ; Line 142
 	mov	rax, QWORD PTR swapChain$[rsp]
 	mov	QWORD PTR d3d12SwapChain$[rsp], rax
@@ -1924,6 +2073,8 @@ $LN19@WinMain:
 	mov	rcx, QWORD PTR d3d12SwapChain$[rsp]
 	call	QWORD PTR [rax+288]
 	mov	DWORD PTR d3d12FrameIndex$[rsp], eax
+; Line 145
+	mov	QWORD PTR d3d12RTVHeap$[rsp], 0
 ; Line 146
 	lea	rax, QWORD PTR rtvHeapDesc$[rsp]
 	mov	rdi, rax
@@ -1942,17 +2093,17 @@ $LN19@WinMain:
 	call	??$IID_PPV_ARGS_Helper@UID3D12DescriptorHeap@@@@YAPEAPEAXPEAPEAUID3D12DescriptorHeap@@@Z ; IID_PPV_ARGS_Helper<ID3D12DescriptorHeap>
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv710[rsp], rcx
+	mov	QWORD PTR tv1175[rsp], rcx
 	mov	r9, rax
 	lea	r8, OFFSET FLAT:_GUID_8efb471d_616c_4f49_90f7_127bb763fa51
 	lea	rdx, QWORD PTR rtvHeapDesc$[rsp]
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
-	mov	rax, QWORD PTR tv710[rsp]
+	mov	rax, QWORD PTR tv1175[rsp]
 	call	QWORD PTR [rax+112]
 	test	eax, eax
-	jge	SHORT $LN20@WinMain
+	jge	SHORT $LN23@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN20@WinMain:
+$LN23@WinMain:
 ; Line 151
 	mov	rax, QWORD PTR d3d12Device$[rsp]
 	mov	rax, QWORD PTR [rax]
@@ -1960,6 +2111,18 @@ $LN20@WinMain:
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
 	call	QWORD PTR [rax+120]
 	mov	DWORD PTR d3d12RTVDescriptorSize$[rsp], eax
+; Line 154
+	lea	rax, QWORD PTR d3d12RenderTargets$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 16
+	rep stosb
+; Line 155
+	lea	rax, QWORD PTR d3d12CommandAllocators$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 16
+	rep stosb
 ; Line 156
 	mov	rax, QWORD PTR d3d12RTVHeap$[rsp]
 	mov	rax, QWORD PTR [rax]
@@ -1984,27 +2147,27 @@ $LN4@WinMain:
 	call	??$IID_PPV_ARGS_Helper@UID3D12Resource@@@@YAPEAPEAXPEAPEAUID3D12Resource@@@Z ; IID_PPV_ARGS_Helper<ID3D12Resource>
 	mov	rcx, QWORD PTR d3d12SwapChain$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv707[rsp], rcx
+	mov	QWORD PTR tv1172[rsp], rcx
 	mov	r9, rax
 	lea	r8, OFFSET FLAT:_GUID_696442be_a72e_4059_bc79_5b5c98040fad
 	mov	edx, DWORD PTR n$1[rsp]
 	mov	rcx, QWORD PTR d3d12SwapChain$[rsp]
-	mov	rax, QWORD PTR tv707[rsp]
+	mov	rax, QWORD PTR tv1172[rsp]
 	call	QWORD PTR [rax+72]
 	test	eax, eax
-	jge	SHORT $LN21@WinMain
+	jge	SHORT $LN24@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN21@WinMain:
+$LN24@WinMain:
 ; Line 159
 	mov	eax, DWORD PTR n$1[rsp]
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv706[rsp], rcx
+	mov	QWORD PTR tv1171[rsp], rcx
 	mov	r9, QWORD PTR rtvHandle$[rsp]
 	xor	r8d, r8d
 	mov	rdx, QWORD PTR d3d12RenderTargets$[rsp+rax*8]
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
-	mov	rax, QWORD PTR tv706[rsp]
+	mov	rax, QWORD PTR tv1171[rsp]
 	call	QWORD PTR [rax+160]
 ; Line 160
 	mov	eax, DWORD PTR d3d12RTVDescriptorSize$[rsp]
@@ -2019,17 +2182,17 @@ $LN21@WinMain:
 	call	??$IID_PPV_ARGS_Helper@UID3D12CommandAllocator@@@@YAPEAPEAXPEAPEAUID3D12CommandAllocator@@@Z ; IID_PPV_ARGS_Helper<ID3D12CommandAllocator>
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv705[rsp], rcx
+	mov	QWORD PTR tv1170[rsp], rcx
 	mov	r9, rax
 	lea	r8, OFFSET FLAT:_GUID_6102dee4_af59_4b09_b999_b44d73f09b24
 	xor	edx, edx
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
-	mov	rax, QWORD PTR tv705[rsp]
+	mov	rax, QWORD PTR tv1170[rsp]
 	call	QWORD PTR [rax+72]
 	test	eax, eax
-	jge	SHORT $LN22@WinMain
+	jge	SHORT $LN25@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN22@WinMain:
+$LN25@WinMain:
 ; Line 162
 	jmp	$LN2@WinMain
 $LN3@WinMain:
@@ -2039,7 +2202,7 @@ $LN3@WinMain:
 	mov	ecx, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rdx, QWORD PTR d3d12Device$[rsp]
 	mov	rdx, QWORD PTR [rdx]
-	mov	QWORD PTR tv704[rsp], rdx
+	mov	QWORD PTR tv1169[rsp], rdx
 	mov	QWORD PTR [rsp+48], rax
 	lea	rax, OFFSET FLAT:_GUID_5b160d0f_ac1b_4185_8ba8_b3ae42a5a455
 	mov	QWORD PTR [rsp+40], rax
@@ -2048,101 +2211,601 @@ $LN3@WinMain:
 	xor	r8d, r8d
 	xor	edx, edx
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
-	mov	rax, QWORD PTR tv704[rsp]
+	mov	rax, QWORD PTR tv1169[rsp]
 	call	QWORD PTR [rax+96]
 	test	eax, eax
-	jge	SHORT $LN23@WinMain
+	jge	SHORT $LN26@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN23@WinMain:
+$LN26@WinMain:
 ; Line 165
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
 	mov	rax, QWORD PTR [rax]
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	call	QWORD PTR [rax+72]
 	test	eax, eax
-	jge	SHORT $LN24@WinMain
+	jge	SHORT $LN27@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN24@WinMain:
+$LN27@WinMain:
+; Line 167
+	mov	QWORD PTR d3d12GraphicsRootSignature$[rsp], 0
+; Line 168
+	lea	rax, QWORD PTR rootSignatureDesc$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 40					; 00000028H
+	rep stosb
+; Line 169
+	mov	DWORD PTR rootSignatureDesc$[rsp+32], 1
 ; Line 170
+	mov	QWORD PTR signature$[rsp], 0
+; Line 171
+	mov	QWORD PTR error$[rsp], 0
+; Line 172
+	lea	r9, QWORD PTR error$[rsp]
+	lea	r8, QWORD PTR signature$[rsp]
+	mov	edx, 1
+	lea	rcx, QWORD PTR rootSignatureDesc$[rsp]
+	call	D3D12SerializeRootSignature
+	test	eax, eax
+	jge	SHORT $LN28@WinMain
+	mov	DWORD PTR ds:0, 0
+$LN28@WinMain:
+; Line 173
+	lea	rcx, QWORD PTR d3d12GraphicsRootSignature$[rsp]
+	call	??$IID_PPV_ARGS_Helper@UID3D12RootSignature@@@@YAPEAPEAXPEAPEAUID3D12RootSignature@@@Z ; IID_PPV_ARGS_Helper<ID3D12RootSignature>
+	mov	QWORD PTR tv445[rsp], rax
+	mov	rcx, QWORD PTR signature$[rsp]
+	mov	rcx, QWORD PTR [rcx]
+	mov	QWORD PTR tv1167[rsp], rcx
+	mov	rcx, QWORD PTR signature$[rsp]
+	mov	rdx, QWORD PTR tv1167[rsp]
+	call	QWORD PTR [rdx+32]
+	mov	QWORD PTR tv484[rsp], rax
+	mov	rcx, QWORD PTR signature$[rsp]
+	mov	rcx, QWORD PTR [rcx]
+	mov	QWORD PTR tv1166[rsp], rcx
+	mov	rcx, QWORD PTR signature$[rsp]
+	mov	rdx, QWORD PTR tv1166[rsp]
+	call	QWORD PTR [rdx+24]
+	mov	rcx, QWORD PTR d3d12Device$[rsp]
+	mov	rcx, QWORD PTR [rcx]
+	mov	QWORD PTR tv1165[rsp], rcx
+	mov	rdx, QWORD PTR tv445[rsp]
+	mov	QWORD PTR [rsp+40], rdx
+	lea	rdx, OFFSET FLAT:_GUID_c54a6b66_72df_4ee8_8be5_a946a1429214
+	mov	QWORD PTR [rsp+32], rdx
+	mov	rdx, QWORD PTR tv484[rsp]
+	mov	r9, rdx
+	mov	r8, rax
+	xor	edx, edx
+	mov	rcx, QWORD PTR d3d12Device$[rsp]
+	mov	rax, QWORD PTR tv1165[rsp]
+	call	QWORD PTR [rax+128]
+	test	eax, eax
+	jge	SHORT $LN29@WinMain
+	mov	DWORD PTR ds:0, 0
+$LN29@WinMain:
+; Line 179
+	mov	DWORD PTR d3d12CompileFlags$[rsp], 5
+; Line 180
+	mov	QWORD PTR vertexShader$[rsp], 0
+; Line 181
+	mov	QWORD PTR pixelShader$[rsp], 0
+; Line 183
+	lea	rax, QWORD PTR error$[rsp]
+	mov	QWORD PTR [rsp+64], rax
+	lea	rax, QWORD PTR vertexShader$[rsp]
+	mov	QWORD PTR [rsp+56], rax
+	mov	DWORD PTR [rsp+48], 0
+	mov	eax, DWORD PTR d3d12CompileFlags$[rsp]
+	mov	DWORD PTR [rsp+40], eax
+	lea	rax, OFFSET FLAT:$SG141164
+	mov	QWORD PTR [rsp+32], rax
+	lea	r9, OFFSET FLAT:$SG141165
+	xor	r8d, r8d
+	xor	edx, edx
+	lea	rcx, OFFSET FLAT:$SG141166
+	call	D3DCompileFromFile
+; Line 184
+	cmp	QWORD PTR error$[rsp], 0
+	je	SHORT $LN30@WinMain
+; Line 185
+	mov	rax, QWORD PTR error$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rcx, QWORD PTR error$[rsp]
+	call	QWORD PTR [rax+24]
+	xor	r9d, r9d
+	lea	r8, OFFSET FLAT:$SG141168
+	mov	rdx, rax
+	xor	ecx, ecx
+	call	QWORD PTR __imp_MessageBoxA
+; Line 186
+	mov	ecx, 1
+	call	exit
+$LN30@WinMain:
+; Line 189
+	lea	rax, QWORD PTR error$[rsp]
+	mov	QWORD PTR [rsp+64], rax
+	lea	rax, QWORD PTR pixelShader$[rsp]
+	mov	QWORD PTR [rsp+56], rax
+	mov	DWORD PTR [rsp+48], 0
+	mov	eax, DWORD PTR d3d12CompileFlags$[rsp]
+	mov	DWORD PTR [rsp+40], eax
+	lea	rax, OFFSET FLAT:$SG141169
+	mov	QWORD PTR [rsp+32], rax
+	lea	r9, OFFSET FLAT:$SG141170
+	xor	r8d, r8d
+	xor	edx, edx
+	lea	rcx, OFFSET FLAT:$SG141171
+	call	D3DCompileFromFile
+; Line 190
+	cmp	QWORD PTR error$[rsp], 0
+	je	SHORT $LN31@WinMain
+; Line 191
+	mov	rax, QWORD PTR error$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rcx, QWORD PTR error$[rsp]
+	call	QWORD PTR [rax+24]
+	xor	r9d, r9d
+	lea	r8, OFFSET FLAT:$SG141173
+	mov	rdx, rax
+	xor	ecx, ecx
+	call	QWORD PTR __imp_MessageBoxA
+; Line 192
+	mov	ecx, 1
+	call	exit
+$LN31@WinMain:
+; Line 195
+	lea	rax, OFFSET FLAT:$SG141174
+	mov	QWORD PTR inputElementDescs$[rsp], rax
+	mov	DWORD PTR inputElementDescs$[rsp+8], 0
+	mov	DWORD PTR inputElementDescs$[rsp+12], 6
+	mov	DWORD PTR inputElementDescs$[rsp+16], 0
+	mov	DWORD PTR inputElementDescs$[rsp+20], 0
+	mov	DWORD PTR inputElementDescs$[rsp+24], 0
+	mov	DWORD PTR inputElementDescs$[rsp+28], 0
+; Line 198
+	lea	rax, QWORD PTR psoDesc$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 656				; 00000290H
+	rep stosb
+; Line 199
+	lea	rax, QWORD PTR inputElementDescs$[rsp]
+	mov	QWORD PTR $T8[rsp], rax
+	mov	DWORD PTR $T8[rsp+8], 1
+	lea	rax, QWORD PTR psoDesc$[rsp+552]
+	lea	rcx, QWORD PTR $T8[rsp]
+	mov	rdi, rax
+	mov	rsi, rcx
+	mov	ecx, 16
+	rep movsb
+; Line 200
+	mov	rax, QWORD PTR d3d12GraphicsRootSignature$[rsp]
+	mov	QWORD PTR psoDesc$[rsp], rax
+; Line 201
+	mov	rax, QWORD PTR vertexShader$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rcx, QWORD PTR vertexShader$[rsp]
+	call	QWORD PTR [rax+32]
+	mov	QWORD PTR psoDesc$[rsp+16], rax
+; Line 202
+	mov	rax, QWORD PTR vertexShader$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rcx, QWORD PTR vertexShader$[rsp]
+	call	QWORD PTR [rax+24]
+	mov	QWORD PTR psoDesc$[rsp+8], rax
+; Line 203
+	mov	rax, QWORD PTR pixelShader$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rcx, QWORD PTR pixelShader$[rsp]
+	call	QWORD PTR [rax+32]
+	mov	QWORD PTR psoDesc$[rsp+32], rax
+; Line 204
+	mov	rax, QWORD PTR pixelShader$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rcx, QWORD PTR pixelShader$[rsp]
+	call	QWORD PTR [rax+24]
+	mov	QWORD PTR psoDesc$[rsp+24], rax
+; Line 205
+	mov	DWORD PTR psoDesc$[rsp+452], 3
+; Line 206
+	mov	DWORD PTR psoDesc$[rsp+456], 3
+; Line 207
+	mov	DWORD PTR psoDesc$[rsp+460], 0
+; Line 208
+	mov	DWORD PTR psoDesc$[rsp+464], 0
+; Line 209
+	xorps	xmm0, xmm0
+	movss	DWORD PTR psoDesc$[rsp+468], xmm0
+; Line 210
+	xorps	xmm0, xmm0
+	movss	DWORD PTR psoDesc$[rsp+472], xmm0
+; Line 211
+	mov	DWORD PTR psoDesc$[rsp+476], 1
+; Line 212
+	mov	DWORD PTR psoDesc$[rsp+480], 0
+; Line 213
+	mov	DWORD PTR psoDesc$[rsp+484], 0
+; Line 214
+	mov	DWORD PTR psoDesc$[rsp+488], 0
+; Line 215
+	mov	DWORD PTR psoDesc$[rsp+492], 0
+; Line 217
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp], 1
+; Line 218
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp+4], 0
+; Line 219
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp+8], 5
+; Line 220
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp+12], 6
+; Line 221
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp+16], 1
+; Line 222
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp+20], 2
+; Line 223
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp+24], 1
+; Line 224
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp+28], 1
+; Line 225
+	mov	DWORD PTR defaultRenderTargetBlendDesc$[rsp+32], 4
+; Line 226
+	mov	BYTE PTR defaultRenderTargetBlendDesc$[rsp+36], 15
+; Line 228
+	mov	DWORD PTR i$2[rsp], 0
+	jmp	SHORT $LN7@WinMain
+$LN5@WinMain:
+	mov	eax, DWORD PTR i$2[rsp]
+	inc	eax
+	mov	DWORD PTR i$2[rsp], eax
+$LN7@WinMain:
+	cmp	DWORD PTR i$2[rsp], 8
+	jae	SHORT $LN6@WinMain
+; Line 229
+	mov	eax, DWORD PTR i$2[rsp]
+	imul	rax, rax, 40				; 00000028H
+	lea	rcx, QWORD PTR defaultRenderTargetBlendDesc$[rsp]
+	lea	rdi, QWORD PTR psoDesc$[rsp+rax+128]
+	mov	rsi, rcx
+	mov	ecx, 40					; 00000028H
+	rep movsb
+; Line 230
+	jmp	SHORT $LN5@WinMain
+$LN6@WinMain:
+; Line 231
+	mov	DWORD PTR psoDesc$[rsp+496], 0
+; Line 232
+	mov	DWORD PTR psoDesc$[rsp+500], 1
+; Line 233
+	mov	DWORD PTR psoDesc$[rsp+504], 4
+; Line 234
+	mov	DWORD PTR psoDesc$[rsp+508], 0
+; Line 235
+	mov	DWORD PTR psoDesc$[rsp+612], 40		; 00000028H
+; Line 236
+	mov	DWORD PTR psoDesc$[rsp+448], -1		; ffffffffH
+; Line 237
+	mov	DWORD PTR psoDesc$[rsp+572], 3
+; Line 238
+	mov	DWORD PTR psoDesc$[rsp+576], 1
+; Line 239
+	mov	eax, 4
+	imul	rax, rax, 0
+	mov	DWORD PTR psoDesc$[rsp+rax+580], 28
+; Line 240
+	mov	DWORD PTR psoDesc$[rsp+616], 1
+; Line 242
+	lea	rcx, QWORD PTR d3d12PipelineState$[rsp]
+	call	??$IID_PPV_ARGS_Helper@UID3D12PipelineState@@@@YAPEAPEAXPEAPEAUID3D12PipelineState@@@Z ; IID_PPV_ARGS_Helper<ID3D12PipelineState>
+	mov	rcx, QWORD PTR d3d12Device$[rsp]
+	mov	rcx, QWORD PTR [rcx]
+	mov	QWORD PTR tv1158[rsp], rcx
+	mov	r9, rax
+	lea	r8, OFFSET FLAT:_GUID_765a30f3_f624_4c6f_a828_ace948622445
+	lea	rdx, QWORD PTR psoDesc$[rsp]
+	mov	rcx, QWORD PTR d3d12Device$[rsp]
+	mov	rax, QWORD PTR tv1158[rsp]
+	call	QWORD PTR [rax+80]
+	test	eax, eax
+	jge	SHORT $LN32@WinMain
+	mov	DWORD PTR ds:0, 0
+$LN32@WinMain:
+; Line 244
+	mov	QWORD PTR d3d12VertexBuffer$[rsp], 0
+; Line 245
+	mov	QWORD PTR d3d12IndexBuffer$[rsp], 0
+; Line 246
+	lea	rax, QWORD PTR d3d12VertexBufferView$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 16
+	rep stosb
+; Line 247
+	lea	rax, QWORD PTR d3d12IndexBufferView$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 16
+	rep stosb
+; Line 249
+	lea	rax, QWORD PTR bufHeapProp$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 20
+	rep stosb
+; Line 250
+	mov	DWORD PTR bufHeapProp$[rsp], 2
+; Line 251
+	mov	DWORD PTR bufHeapProp$[rsp+4], 0
+; Line 252
+	mov	DWORD PTR bufHeapProp$[rsp+8], 0
+; Line 253
+	mov	DWORD PTR bufHeapProp$[rsp+12], 1
+; Line 254
+	mov	DWORD PTR bufHeapProp$[rsp+16], 1
+; Line 256
+	lea	rax, QWORD PTR bufResDesc$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 56					; 00000038H
+	rep stosb
+; Line 257
+	mov	DWORD PTR bufResDesc$[rsp], 1
+; Line 258
+	mov	QWORD PTR bufResDesc$[rsp+8], 0
+; Line 259
+	mov	QWORD PTR bufResDesc$[rsp+16], 1048576	; 00100000H
+; Line 260
+	mov	DWORD PTR bufResDesc$[rsp+24], 1
+; Line 261
+	mov	eax, 1
+	mov	WORD PTR bufResDesc$[rsp+28], ax
+; Line 262
+	mov	eax, 1
+	mov	WORD PTR bufResDesc$[rsp+30], ax
+; Line 263
+	mov	DWORD PTR bufResDesc$[rsp+32], 0
+; Line 264
+	mov	DWORD PTR bufResDesc$[rsp+36], 1
+; Line 265
+	mov	DWORD PTR bufResDesc$[rsp+40], 0
+; Line 266
+	mov	DWORD PTR bufResDesc$[rsp+44], 1
+; Line 267
+	mov	DWORD PTR bufResDesc$[rsp+48], 0
+; Line 269
+	lea	rcx, QWORD PTR d3d12VertexBuffer$[rsp]
+	call	??$IID_PPV_ARGS_Helper@UID3D12Resource@@@@YAPEAPEAXPEAPEAUID3D12Resource@@@Z ; IID_PPV_ARGS_Helper<ID3D12Resource>
+	mov	rcx, QWORD PTR d3d12Device$[rsp]
+	mov	rcx, QWORD PTR [rcx]
+	mov	QWORD PTR tv1157[rsp], rcx
+	mov	QWORD PTR [rsp+56], rax
+	lea	rax, OFFSET FLAT:_GUID_696442be_a72e_4059_bc79_5b5c98040fad
+	mov	QWORD PTR [rsp+48], rax
+	mov	QWORD PTR [rsp+40], 0
+	mov	DWORD PTR [rsp+32], 2755		; 00000ac3H
+	lea	r9, QWORD PTR bufResDesc$[rsp]
+	xor	r8d, r8d
+	lea	rdx, QWORD PTR bufHeapProp$[rsp]
+	mov	rcx, QWORD PTR d3d12Device$[rsp]
+	mov	rax, QWORD PTR tv1157[rsp]
+	call	QWORD PTR [rax+216]
+	test	eax, eax
+	jge	SHORT $LN33@WinMain
+	mov	DWORD PTR ds:0, 0
+$LN33@WinMain:
+; Line 272
+	mov	rax, QWORD PTR d3d12VertexBuffer$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rcx, QWORD PTR d3d12VertexBuffer$[rsp]
+	call	QWORD PTR [rax+88]
+	mov	QWORD PTR d3d12VertexBufferView$[rsp], rax
+; Line 273
+	mov	DWORD PTR d3d12VertexBufferView$[rsp+12], 12
+; Line 274
+	mov	eax, DWORD PTR bufResDesc$[rsp+16]
+	mov	DWORD PTR d3d12VertexBufferView$[rsp+8], eax
+; Line 276
+	lea	rcx, QWORD PTR d3d12IndexBuffer$[rsp]
+	call	??$IID_PPV_ARGS_Helper@UID3D12Resource@@@@YAPEAPEAXPEAPEAUID3D12Resource@@@Z ; IID_PPV_ARGS_Helper<ID3D12Resource>
+	mov	rcx, QWORD PTR d3d12Device$[rsp]
+	mov	rcx, QWORD PTR [rcx]
+	mov	QWORD PTR tv1155[rsp], rcx
+	mov	QWORD PTR [rsp+56], rax
+	lea	rax, OFFSET FLAT:_GUID_696442be_a72e_4059_bc79_5b5c98040fad
+	mov	QWORD PTR [rsp+48], rax
+	mov	QWORD PTR [rsp+40], 0
+	mov	DWORD PTR [rsp+32], 2755		; 00000ac3H
+	lea	r9, QWORD PTR bufResDesc$[rsp]
+	xor	r8d, r8d
+	lea	rdx, QWORD PTR bufHeapProp$[rsp]
+	mov	rcx, QWORD PTR d3d12Device$[rsp]
+	mov	rax, QWORD PTR tv1155[rsp]
+	call	QWORD PTR [rax+216]
+	test	eax, eax
+	jge	SHORT $LN34@WinMain
+	mov	DWORD PTR ds:0, 0
+$LN34@WinMain:
+; Line 279
+	mov	rax, QWORD PTR d3d12IndexBuffer$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rcx, QWORD PTR d3d12IndexBuffer$[rsp]
+	call	QWORD PTR [rax+88]
+	mov	QWORD PTR d3d12IndexBufferView$[rsp], rax
+; Line 280
+	mov	DWORD PTR d3d12IndexBufferView$[rsp+12], 57 ; 00000039H
+; Line 281
+	mov	eax, DWORD PTR bufResDesc$[rsp+16]
+	mov	DWORD PTR d3d12IndexBufferView$[rsp+8], eax
+; Line 284
+	movss	xmm0, DWORD PTR __real@bf000000
+	movss	DWORD PTR triVerts$[rsp], xmm0
+	movss	xmm0, DWORD PTR __real@bf000000
+	movss	DWORD PTR triVerts$[rsp+4], xmm0
+	xorps	xmm0, xmm0
+	movss	DWORD PTR triVerts$[rsp+8], xmm0
+; Line 285
+	xorps	xmm0, xmm0
+	movss	DWORD PTR triVerts$[rsp+12], xmm0
+	movss	xmm0, DWORD PTR __real@3f000000
+	movss	DWORD PTR triVerts$[rsp+16], xmm0
+	xorps	xmm0, xmm0
+	movss	DWORD PTR triVerts$[rsp+20], xmm0
+; Line 286
+	movss	xmm0, DWORD PTR __real@3f000000
+	movss	DWORD PTR triVerts$[rsp+24], xmm0
+	movss	xmm0, DWORD PTR __real@bf000000
+	movss	DWORD PTR triVerts$[rsp+28], xmm0
+	xorps	xmm0, xmm0
+	movss	DWORD PTR triVerts$[rsp+32], xmm0
+; Line 288
+	xor	eax, eax
+	mov	WORD PTR triElms$[rsp], ax
+	mov	eax, 1
+	mov	WORD PTR triElms$[rsp+2], ax
+	mov	eax, 2
+	mov	WORD PTR triElms$[rsp+4], ax
+; Line 289
+	mov	QWORD PTR vPtr$[rsp], 0
+; Line 290
+	mov	QWORD PTR ePtr$[rsp], 0
+; Line 291
+	mov	rax, QWORD PTR d3d12VertexBuffer$[rsp]
+	mov	rax, QWORD PTR [rax]
+	lea	r9, QWORD PTR vPtr$[rsp]
+	xor	r8d, r8d
+	xor	edx, edx
+	mov	rcx, QWORD PTR d3d12VertexBuffer$[rsp]
+	call	QWORD PTR [rax+64]
+	test	eax, eax
+	jge	SHORT $LN35@WinMain
+	mov	DWORD PTR ds:0, 0
+$LN35@WinMain:
+; Line 292
+	mov	rax, QWORD PTR d3d12IndexBuffer$[rsp]
+	mov	rax, QWORD PTR [rax]
+	lea	r9, QWORD PTR ePtr$[rsp]
+	xor	r8d, r8d
+	xor	edx, edx
+	mov	rcx, QWORD PTR d3d12IndexBuffer$[rsp]
+	call	QWORD PTR [rax+64]
+	test	eax, eax
+	jge	SHORT $LN36@WinMain
+	mov	DWORD PTR ds:0, 0
+$LN36@WinMain:
+; Line 293
+	lea	rax, QWORD PTR triVerts$[rsp]
+	mov	rdi, QWORD PTR vPtr$[rsp]
+	mov	rsi, rax
+	mov	ecx, 36					; 00000024H
+	rep movsb
+; Line 294
+	lea	rax, QWORD PTR triElms$[rsp]
+	mov	rdi, QWORD PTR ePtr$[rsp]
+	mov	rsi, rax
+	mov	ecx, 6
+	rep movsb
+; Line 295
+	mov	rax, QWORD PTR d3d12VertexBuffer$[rsp]
+	mov	rax, QWORD PTR [rax]
+	xor	r8d, r8d
+	xor	edx, edx
+	mov	rcx, QWORD PTR d3d12VertexBuffer$[rsp]
+	call	QWORD PTR [rax+72]
+; Line 296
+	mov	rax, QWORD PTR d3d12IndexBuffer$[rsp]
+	mov	rax, QWORD PTR [rax]
+	xor	r8d, r8d
+	xor	edx, edx
+	mov	rcx, QWORD PTR d3d12IndexBuffer$[rsp]
+	call	QWORD PTR [rax+72]
+; Line 302
+	mov	QWORD PTR d3d12Fence$[rsp], 0
+; Line 304
+	lea	rax, QWORD PTR d3d12FenceValues$[rsp]
+	mov	rdi, rax
+	xor	eax, eax
+	mov	ecx, 16
+	rep stosb
+; Line 305
 	lea	rcx, QWORD PTR d3d12Fence$[rsp]
 	call	??$IID_PPV_ARGS_Helper@UID3D12Fence@@@@YAPEAPEAXPEAPEAUID3D12Fence@@@Z ; IID_PPV_ARGS_Helper<ID3D12Fence>
 	mov	ecx, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rdx, QWORD PTR d3d12Device$[rsp]
 	mov	rdx, QWORD PTR [rdx]
-	mov	QWORD PTR tv702[rsp], rdx
+	mov	QWORD PTR tv1149[rsp], rdx
 	mov	QWORD PTR [rsp+32], rax
 	lea	r9, OFFSET FLAT:_GUID_0a753dcf_c4d8_4b91_adf6_be5a60d95a76
 	xor	r8d, r8d
 	mov	rdx, QWORD PTR d3d12FenceValues$[rsp+rcx*8]
 	mov	rcx, QWORD PTR d3d12Device$[rsp]
-	mov	rax, QWORD PTR tv702[rsp]
+	mov	rax, QWORD PTR tv1149[rsp]
 	call	QWORD PTR [rax+288]
 	test	eax, eax
-	jge	SHORT $LN25@WinMain
+	jge	SHORT $LN37@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN25@WinMain:
-; Line 171
+$LN37@WinMain:
+; Line 306
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rax, QWORD PTR d3d12FenceValues$[rsp+rax*8]
 	inc	rax
 	mov	ecx, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	QWORD PTR d3d12FenceValues$[rsp+rcx*8], rax
-; Line 173
+; Line 308
 	xor	r9d, r9d
 	xor	r8d, r8d
 	xor	edx, edx
 	xor	ecx, ecx
 	call	QWORD PTR __imp_CreateEventA
 	mov	QWORD PTR d3d12FenceEvent$[rsp], rax
-; Line 174
+; Line 309
 	cmp	QWORD PTR d3d12FenceEvent$[rsp], 0
-	jne	SHORT $LN26@WinMain
-; Line 175
+	jne	SHORT $LN38@WinMain
+; Line 310
 	call	QWORD PTR __imp_GetLastError
 	mov	ecx, eax
 	call	?HRESULT_FROM_WIN32@@YAJK@Z		; HRESULT_FROM_WIN32
 	test	eax, eax
-	jge	SHORT $LN27@WinMain
+	jge	SHORT $LN39@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN27@WinMain:
-$LN26@WinMain:
-; Line 179
+$LN39@WinMain:
+$LN38@WinMain:
+; Line 314
 	mov	edx, DWORD PTR nCmdShow$[rsp]
 	mov	rcx, QWORD PTR windowHandle$[rsp]
 	call	QWORD PTR __imp_ShowWindow
-; Line 180
+; Line 315
 	mov	BYTE PTR running$[rsp], 1
-$LN5@WinMain:
-; Line 181
+$LN8@WinMain:
+; Line 316
 	movzx	eax, BYTE PTR running$[rsp]
 	test	eax, eax
-	je	$LN6@WinMain
-; Line 182
-	lea	rax, QWORD PTR msg$8[rsp]
+	je	$LN9@WinMain
+; Line 317
+	lea	rax, QWORD PTR msg$10[rsp]
 	mov	rdi, rax
 	xor	eax, eax
 	mov	ecx, 48					; 00000030H
 	rep stosb
-$LN7@WinMain:
-; Line 183
+$LN10@WinMain:
+; Line 318
 	mov	DWORD PTR [rsp+32], 1
 	xor	r9d, r9d
 	xor	r8d, r8d
 	xor	edx, edx
-	lea	rcx, QWORD PTR msg$8[rsp]
+	lea	rcx, QWORD PTR msg$10[rsp]
 	call	QWORD PTR __imp_PeekMessageA
 	test	eax, eax
-	je	SHORT $LN8@WinMain
-; Line 184
-	lea	rcx, QWORD PTR msg$8[rsp]
+	je	SHORT $LN11@WinMain
+; Line 319
+	lea	rcx, QWORD PTR msg$10[rsp]
 	call	QWORD PTR __imp_TranslateMessage
-; Line 185
-	lea	rcx, QWORD PTR msg$8[rsp]
+; Line 320
+	lea	rcx, QWORD PTR msg$10[rsp]
 	call	QWORD PTR __imp_DispatchMessageA
-; Line 186
-	jmp	SHORT $LN7@WinMain
-$LN8@WinMain:
-; Line 189
+; Line 321
+	jmp	SHORT $LN10@WinMain
+$LN11@WinMain:
+; Line 323
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rax, QWORD PTR d3d12CommandAllocators$[rsp+rax*8]
 	mov	ecx, DWORD PTR d3d12FrameIndex$[rsp]
@@ -2150,59 +2813,59 @@ $LN8@WinMain:
 	mov	rax, QWORD PTR [rax]
 	call	QWORD PTR [rax+64]
 	test	eax, eax
-	jge	SHORT $LN28@WinMain
+	jge	SHORT $LN40@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN28@WinMain:
-; Line 190
+$LN40@WinMain:
+; Line 324
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv699[rsp], rcx
-	xor	r8d, r8d
+	mov	QWORD PTR tv1146[rsp], rcx
+	mov	r8, QWORD PTR d3d12PipelineState$[rsp]
 	mov	rdx, QWORD PTR d3d12CommandAllocators$[rsp+rax*8]
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
-	mov	rax, QWORD PTR tv699[rsp]
+	mov	rax, QWORD PTR tv1146[rsp]
 	call	QWORD PTR [rax+80]
 	test	eax, eax
-	jge	SHORT $LN29@WinMain
+	jge	SHORT $LN41@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN29@WinMain:
-; Line 192
-	lea	rax, QWORD PTR resBarrier$3[rsp]
+$LN41@WinMain:
+; Line 326
+	lea	rax, QWORD PTR resBarrier$6[rsp]
 	mov	rdi, rax
 	xor	eax, eax
 	mov	ecx, 32					; 00000020H
 	rep stosb
-; Line 193
-	mov	DWORD PTR resBarrier$3[rsp], 0
-; Line 194
-	mov	DWORD PTR resBarrier$3[rsp+4], 0
-; Line 195
+; Line 327
+	mov	DWORD PTR resBarrier$6[rsp], 0
+; Line 328
+	mov	DWORD PTR resBarrier$6[rsp+4], 0
+; Line 329
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rax, QWORD PTR d3d12RenderTargets$[rsp+rax*8]
-	mov	QWORD PTR resBarrier$3[rsp+8], rax
-; Line 196
-	mov	DWORD PTR resBarrier$3[rsp+20], 0
-; Line 197
-	mov	DWORD PTR resBarrier$3[rsp+24], 4
-; Line 198
-	mov	DWORD PTR resBarrier$3[rsp+16], -1	; ffffffffH
-; Line 200
+	mov	QWORD PTR resBarrier$6[rsp+8], rax
+; Line 330
+	mov	DWORD PTR resBarrier$6[rsp+20], 0
+; Line 331
+	mov	DWORD PTR resBarrier$6[rsp+24], 4
+; Line 332
+	mov	DWORD PTR resBarrier$6[rsp+16], -1	; ffffffffH
+; Line 334
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
 	mov	rax, QWORD PTR [rax]
-	lea	r8, QWORD PTR resBarrier$3[rsp]
+	lea	r8, QWORD PTR resBarrier$6[rsp]
 	mov	edx, 1
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	call	QWORD PTR [rax+208]
-; Line 202
+; Line 336
 	mov	rax, QWORD PTR d3d12RTVHeap$[rsp]
 	mov	rax, QWORD PTR [rax]
-	lea	rdx, QWORD PTR $T7[rsp]
+	lea	rdx, QWORD PTR $T9[rsp]
 	mov	rcx, QWORD PTR d3d12RTVHeap$[rsp]
 	call	QWORD PTR [rax+72]
 	mov	rax, QWORD PTR [rax]
 	mov	QWORD PTR rtvHandle$[rsp], rax
-; Line 203
+; Line 337
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	imul	eax, DWORD PTR d3d12RTVDescriptorSize$[rsp]
 	mov	eax, eax
@@ -2210,21 +2873,21 @@ $LN29@WinMain:
 	add	rcx, rax
 	mov	rax, rcx
 	mov	QWORD PTR rtvHandle$[rsp], rax
-; Line 204
+; Line 338
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
 	mov	rax, QWORD PTR [rax]
 	lea	r8, QWORD PTR d3d12Viewport$[rsp]
 	mov	edx, 1
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	call	QWORD PTR [rax+168]
-; Line 205
+; Line 339
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
 	mov	rax, QWORD PTR [rax]
 	lea	r8, QWORD PTR d3d12ScissorRect$[rsp]
 	mov	edx, 1
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	call	QWORD PTR [rax+176]
-; Line 206
+; Line 340
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
 	mov	rax, QWORD PTR [rax]
 	mov	QWORD PTR [rsp+32], 0
@@ -2233,54 +2896,90 @@ $LN29@WinMain:
 	mov	edx, 1
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	call	QWORD PTR [rax+368]
-; Line 207
+; Line 341
 	movss	xmm0, DWORD PTR __real@3f800000
 	movss	DWORD PTR [rsp+32], xmm0
-	movss	xmm3, DWORD PTR __real@3f800000
+	xorps	xmm3, xmm3
 	movss	xmm2, DWORD PTR __real@3f800000
 	xorps	xmm1, xmm1
-	lea	rcx, QWORD PTR cc$9[rsp]
+	lea	rcx, QWORD PTR cc$11[rsp]
 	call	??0Vector4@@QEAA@MMMM@Z			; Vector4::Vector4
-; Line 208
+; Line 342
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
 	mov	rax, QWORD PTR [rax]
 	mov	QWORD PTR [rsp+32], 0
 	xor	r9d, r9d
-	lea	r8, QWORD PTR cc$9[rsp]
+	lea	r8, QWORD PTR cc$11[rsp]
 	mov	rdx, QWORD PTR rtvHandle$[rsp]
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	call	QWORD PTR [rax+384]
-; Line 210
-	mov	DWORD PTR resBarrier$3[rsp+20], 4
-; Line 211
-	mov	DWORD PTR resBarrier$3[rsp+24], 0
-; Line 212
+; Line 343
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
 	mov	rax, QWORD PTR [rax]
-	lea	r8, QWORD PTR resBarrier$3[rsp]
+	mov	edx, 4
+	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
+	call	QWORD PTR [rax+160]
+; Line 344
+	mov	rax, QWORD PTR d3d12CommandList$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	rdx, QWORD PTR d3d12GraphicsRootSignature$[rsp]
+	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
+	call	QWORD PTR [rax+240]
+; Line 345
+	mov	rax, QWORD PTR d3d12CommandList$[rsp]
+	mov	rax, QWORD PTR [rax]
+	lea	r9, QWORD PTR d3d12VertexBufferView$[rsp]
+	mov	r8d, 1
+	xor	edx, edx
+	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
+	call	QWORD PTR [rax+352]
+; Line 346
+	mov	rax, QWORD PTR d3d12CommandList$[rsp]
+	mov	rax, QWORD PTR [rax]
+	lea	rdx, QWORD PTR d3d12IndexBufferView$[rsp]
+	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
+	call	QWORD PTR [rax+344]
+; Line 348
+	mov	rax, QWORD PTR d3d12CommandList$[rsp]
+	mov	rax, QWORD PTR [rax]
+	mov	DWORD PTR [rsp+40], 0
+	mov	DWORD PTR [rsp+32], 0
+	xor	r9d, r9d
+	mov	r8d, 1
+	mov	edx, 3
+	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
+	call	QWORD PTR [rax+104]
+; Line 350
+	mov	DWORD PTR resBarrier$6[rsp+20], 4
+; Line 351
+	mov	DWORD PTR resBarrier$6[rsp+24], 0
+; Line 352
+	mov	rax, QWORD PTR d3d12CommandList$[rsp]
+	mov	rax, QWORD PTR [rax]
+	lea	r8, QWORD PTR resBarrier$6[rsp]
 	mov	edx, 1
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	call	QWORD PTR [rax+208]
-; Line 214
+; Line 354
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
 	mov	rax, QWORD PTR [rax]
 	mov	rcx, QWORD PTR d3d12CommandList$[rsp]
 	call	QWORD PTR [rax+72]
 	test	eax, eax
-	jge	SHORT $LN30@WinMain
+	jge	SHORT $LN42@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN30@WinMain:
-; Line 216
+$LN42@WinMain:
+; Line 356
 	mov	rax, QWORD PTR d3d12CommandList$[rsp]
-	mov	QWORD PTR ppCommandList$4[rsp], rax
-; Line 217
+	mov	QWORD PTR ppCommandList$7[rsp], rax
+; Line 357
 	mov	rax, QWORD PTR d3d12CommandQueue$[rsp]
 	mov	rax, QWORD PTR [rax]
-	lea	r8, QWORD PTR ppCommandList$4[rsp]
+	lea	r8, QWORD PTR ppCommandList$7[rsp]
 	mov	edx, 1
 	mov	rcx, QWORD PTR d3d12CommandQueue$[rsp]
 	call	QWORD PTR [rax+80]
-; Line 219
+; Line 359
 	mov	rax, QWORD PTR d3d12SwapChain$[rsp]
 	mov	rax, QWORD PTR [rax]
 	xor	r8d, r8d
@@ -2288,113 +2987,115 @@ $LN30@WinMain:
 	mov	rcx, QWORD PTR d3d12SwapChain$[rsp]
 	call	QWORD PTR [rax+64]
 	test	eax, eax
-	jge	SHORT $LN31@WinMain
+	jge	SHORT $LN43@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN31@WinMain:
-; Line 221
+$LN43@WinMain:
+; Line 361
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rax, QWORD PTR d3d12FenceValues$[rsp+rax*8]
-	mov	QWORD PTR currentFenceValue$2[rsp], rax
-; Line 223
+	mov	QWORD PTR currentFenceValue$5[rsp], rax
+; Line 363
 	mov	rax, QWORD PTR d3d12CommandQueue$[rsp]
 	mov	rax, QWORD PTR [rax]
-	mov	r8, QWORD PTR currentFenceValue$2[rsp]
+	mov	r8, QWORD PTR currentFenceValue$5[rsp]
 	mov	rdx, QWORD PTR d3d12Fence$[rsp]
 	mov	rcx, QWORD PTR d3d12CommandQueue$[rsp]
 	call	QWORD PTR [rax+112]
 	test	eax, eax
-	jge	SHORT $LN32@WinMain
+	jge	SHORT $LN44@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN32@WinMain:
-; Line 224
+$LN44@WinMain:
+; Line 364
 	mov	rax, QWORD PTR d3d12SwapChain$[rsp]
 	mov	rax, QWORD PTR [rax]
 	mov	rcx, QWORD PTR d3d12SwapChain$[rsp]
 	call	QWORD PTR [rax+288]
 	mov	DWORD PTR d3d12FrameIndex$[rsp], eax
-; Line 226
+; Line 366
 	mov	rax, QWORD PTR d3d12Fence$[rsp]
 	mov	rax, QWORD PTR [rax]
 	mov	rcx, QWORD PTR d3d12Fence$[rsp]
 	call	QWORD PTR [rax+64]
 	mov	ecx, DWORD PTR d3d12FrameIndex$[rsp]
 	cmp	rax, QWORD PTR d3d12FenceValues$[rsp+rcx*8]
-	jae	SHORT $LN33@WinMain
-; Line 227
+	jae	SHORT $LN45@WinMain
+; Line 367
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rcx, QWORD PTR d3d12Fence$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv685[rsp], rcx
+	mov	QWORD PTR tv1127[rsp], rcx
 	mov	r8, QWORD PTR d3d12FenceEvent$[rsp]
 	mov	rdx, QWORD PTR d3d12FenceValues$[rsp+rax*8]
 	mov	rcx, QWORD PTR d3d12Fence$[rsp]
-	mov	rax, QWORD PTR tv685[rsp]
+	mov	rax, QWORD PTR tv1127[rsp]
 	call	QWORD PTR [rax+72]
 	test	eax, eax
-	jge	SHORT $LN34@WinMain
+	jge	SHORT $LN46@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN34@WinMain:
-; Line 228
+$LN46@WinMain:
+; Line 368
 	xor	r8d, r8d
 	mov	edx, -1					; ffffffffH
 	mov	rcx, QWORD PTR d3d12FenceEvent$[rsp]
 	call	QWORD PTR __imp_WaitForSingleObjectEx
-$LN33@WinMain:
-; Line 230
-	mov	rax, QWORD PTR currentFenceValue$2[rsp]
+$LN45@WinMain:
+; Line 370
+	mov	rax, QWORD PTR currentFenceValue$5[rsp]
 	inc	rax
 	mov	ecx, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	QWORD PTR d3d12FenceValues$[rsp+rcx*8], rax
-; Line 232
+; Line 372
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rcx, QWORD PTR d3d12CommandQueue$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv684[rsp], rcx
+	mov	QWORD PTR tv1126[rsp], rcx
 	mov	r8, QWORD PTR d3d12FenceValues$[rsp+rax*8]
 	mov	rdx, QWORD PTR d3d12Fence$[rsp]
 	mov	rcx, QWORD PTR d3d12CommandQueue$[rsp]
-	mov	rax, QWORD PTR tv684[rsp]
+	mov	rax, QWORD PTR tv1126[rsp]
 	call	QWORD PTR [rax+112]
 	test	eax, eax
-	jge	SHORT $LN35@WinMain
+	jge	SHORT $LN47@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN35@WinMain:
-; Line 233
+$LN47@WinMain:
+; Line 373
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rcx, QWORD PTR d3d12Fence$[rsp]
 	mov	rcx, QWORD PTR [rcx]
-	mov	QWORD PTR tv683[rsp], rcx
+	mov	QWORD PTR tv1125[rsp], rcx
 	mov	r8, QWORD PTR d3d12FenceEvent$[rsp]
 	mov	rdx, QWORD PTR d3d12FenceValues$[rsp+rax*8]
 	mov	rcx, QWORD PTR d3d12Fence$[rsp]
-	mov	rax, QWORD PTR tv683[rsp]
+	mov	rax, QWORD PTR tv1125[rsp]
 	call	QWORD PTR [rax+72]
 	test	eax, eax
-	jge	SHORT $LN36@WinMain
+	jge	SHORT $LN48@WinMain
 	mov	DWORD PTR ds:0, 0
-$LN36@WinMain:
-; Line 234
+$LN48@WinMain:
+; Line 374
 	xor	r8d, r8d
 	mov	edx, -1					; ffffffffH
 	mov	rcx, QWORD PTR d3d12FenceEvent$[rsp]
 	call	QWORD PTR __imp_WaitForSingleObjectEx
-; Line 235
+; Line 375
 	mov	eax, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	rax, QWORD PTR d3d12FenceValues$[rsp+rax*8]
 	inc	rax
 	mov	ecx, DWORD PTR d3d12FrameIndex$[rsp]
 	mov	QWORD PTR d3d12FenceValues$[rsp+rcx*8], rax
-; Line 237
-	jmp	$LN5@WinMain
-$LN6@WinMain:
-; Line 238
+; Line 376
+	jmp	$LN8@WinMain
+$LN9@WinMain:
+; Line 377
 	xor	eax, eax
-; Line 239
+$LN49@WinMain:
+; Line 378
 	mov	rcx, QWORD PTR __$ArrayPad$[rsp]
 	xor	rcx, rsp
 	call	__security_check_cookie
-	add	rsp, 768				; 00000300H
+	add	rsp, 1880				; 00000758H
 	pop	rdi
+	pop	rsi
 	ret	0
 WinMain	ENDP
 _TEXT	ENDS
